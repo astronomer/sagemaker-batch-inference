@@ -93,7 +93,7 @@ def sagemaker_batch_inference():
                 "InstanceType": "ml.m5.large"
             },
             # "ModelName": "{{ ti.xcom_pull(task_ids='get_transform_model_version') }}"
-            "ModelName": "sagemaker-blogpost-v7"
+            "ModelName": "sagemaker-soln-churn-js-ds266j-2022-08-03-21-53-47-857"
         }
     )
 
