@@ -1,0 +1,2 @@
+openlineage-airflow
+apache-airflow-providers-amazon==4.1.0
