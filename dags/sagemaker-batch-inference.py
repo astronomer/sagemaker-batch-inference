@@ -28,46 +28,19 @@ def sagemaker_batch_inference():
     This demonstrates a batch inference pipeline using Amazon Sagemaker's Batch Transform.
     """
 
-    # @task(task_id='get_transform_model_version')
-    # def get_transform_model_version():
-    #
-    #     sagemaker_client = boto3.client('sagemaker')
-    #     registered_models = sagemaker_client.list_model_packages(ModelPackageGroupName="sagemaker-blogpost")
-    #
-    #     model_version = sagemaker_client.describe_model_package(
-    #         ModelPackageName=registered_models['ModelPackageSummaryList'][0]['ModelPackageArn']
-    #     )
-    #
-    #     model_name = "{0}-v{1}".format(model_version['ModelPackageGroupName'], model_version['ModelPackageVersion'])
-    #
-    #     return model_name
-    #
-    #     # transform_config = {
-    #     #     "BatchStrategy": "SingleRecord",
-    #     #     "TransformJobName": "astro-churn-{0}".format(kwargs['ts_nodash']),
-    #     #     "TransformInput": {
-    #     #         "DataSource": {
-    #     #             "S3DataSource": {
-    #     #                 "S3DataType": "S3Prefix",
-    #     #                 "S3Uri": "s3://{0}/{1}/input.jsonl".format(s3_bucket, input_s3_key)
-    #     #             }
-    #     #         },
-    #     #         "SplitType": "Line",
-    #     #         "ContentType": "application/json",
-    #     #     },
-    #     #     "TransformOutput": {
-    #     #         "AssembleWith": "Line",
-    #     #         "S3OutputPath": "s3://{0}/{1}".format(s3_bucket, output_s3_key)
-    #     #     },
-    #     #     "TransformResources": {
-    #     #         "InstanceCount": 1,
-    #     #         "InstanceType": "ml.m5.large"
-    #     #     },
-    #     #     "ModelName": model_name
-    #     # }
-    #
-    #     # return {"transform_config": transform_config}
-    #     # return json.dumps(transform_config)
+    @task(task_id='get_latest_model_version')
+    def get_latest_model_version():
+
+        sagemaker_client = boto3.client('sagemaker')
+        registered_models = sagemaker_client.list_model_packages(ModelPackageGroupName="sagemaker-blogpost")
+
+        model_version = sagemaker_client.describe_model_package(
+            ModelPackageName=registered_models['ModelPackageSummaryList'][0]['ModelPackageArn']
+        )
+
+        model_name = "{0}-v{1}".format(model_version['ModelPackageGroupName'], model_version['ModelPackageVersion'])
+
+        return model_name
 
     predict = SageMakerTransformOperator(
         task_id='predict',
@@ -92,12 +65,12 @@ def sagemaker_batch_inference():
                 "InstanceCount": 1,
                 "InstanceType": "ml.m5.large"
             },
-            # "ModelName": "{{ ti.xcom_pull(task_ids='get_transform_model_version') }}"
-            "ModelName": "sagemaker-soln-churn-js-ds266j-2022-08-03-21-53-47-857"
+            "ModelName": "{{ ti.xcom_pull(task_ids='get_latest_model_version') }}"
+            # "ModelName": "sagemaker-blogpost-v9"
         }
     )
 
-    # get_transform_model_version() >> predict
+    get_latest_model_version() >> predict
 
 
 dag = sagemaker_batch_inference()
