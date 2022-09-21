@@ -17,7 +17,7 @@ class S3XComBackend(BaseXCom):
             key         = "data_" + str(uuid.uuid4())
             filename    = f"{key}.csv"
 
-            value.to_csv(filename, index=False, header=False)
+            value.to_csv(filename, index=False, header=None)
             hook.load_file(
                 filename=filename,
                 key=key,
@@ -38,5 +38,5 @@ class S3XComBackend(BaseXCom):
                 bucket_name=S3XComBackend.BUCKET_NAME,
                 local_path="/tmp"
             )
-            result = pd.read_csv(filename, header=None)
+            result = pd.read_csv(filename, header=False)
         return result
