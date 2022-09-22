@@ -3,8 +3,10 @@ from pendulum import datetime
 
 import boto3
 from airflow.decorators import dag, task, task_group
-from airflow.providers.amazon.aws.operators.sagemaker import SageMakerTransformOperator
-from airflow.providers.amazon.aws.operators.sagemaker import SageMakerProcessingOperator
+from airflow.providers.amazon.aws.operators.sagemaker import (
+    SageMakerProcessingOperator,
+    SageMakerTransformOperator,
+)
 from airflow.providers.amazon.aws.hooks.sagemaker import SageMakerHook
 
 output_s3_key = "experiments-demo/predict/output/"
