@@ -24,7 +24,6 @@ clean_data = "experiments-demo/predict/input/clean_data.csv"
         "retry_delay": timedelta(minutes=3),
         'aws_conn_id': 'aws_default'
     },
-    # default_view="grid",
     catchup=False,
     tags=["example", "aws", "sagemaker"],
 )
