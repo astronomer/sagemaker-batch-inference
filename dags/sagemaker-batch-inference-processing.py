@@ -1,4 +1,5 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
+from pendulum import datetime
 
 import boto3
 # import pandas as pd
