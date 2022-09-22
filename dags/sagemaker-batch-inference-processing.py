@@ -79,7 +79,7 @@ def sagemaker_batch_inference_processing():
         }
     )
 
-    @task(task_id='get_latest_model_version')
+    @task
     def get_latest_model_version(mpg):
         sagemaker_hook = SageMakerHook()
 
