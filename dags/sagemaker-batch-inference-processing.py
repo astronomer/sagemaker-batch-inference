@@ -2,7 +2,6 @@ from datetime import timedelta
 from pendulum import datetime
 
 import boto3
-# import pandas as pd
 from airflow.decorators import dag, task, task_group
 from airflow.providers.amazon.aws.operators.sagemaker import SageMakerTransformOperator
 from airflow.providers.amazon.aws.operators.sagemaker import SageMakerProcessingOperator
