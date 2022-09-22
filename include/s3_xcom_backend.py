@@ -31,8 +31,8 @@ class S3XComBackend(BaseXCom):
     def deserialize_value(result) -> Any:
         result = BaseXCom.deserialize_value(result)
         if isinstance(result, str) and result.startswith(S3XComBackend.PREFIX):
-            hook    = S3Hook()
-            key     = result.replace(S3XComBackend.PREFIX, "")
+            hook = S3Hook()
+            key = result.replace(S3XComBackend.PREFIX, "")
             filename = hook.download_file(
                 key=key,
                 bucket_name=S3XComBackend.BUCKET_NAME,
