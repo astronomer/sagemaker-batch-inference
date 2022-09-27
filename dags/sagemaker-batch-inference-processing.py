@@ -29,7 +29,7 @@ clean_data = "experiments-demo/predict/input/clean_data.csv"
 )
 def sagemaker_batch_inference_processing():
     """
-    This demonstrates a batch inference pipeline using Amazon Sagemaker's Model Registry, Batch Transform, and Processing
+    A batch inference pipeline using Amazon Sagemaker's Model Registry, Batch Transform, and Processing
     features.
     """
 
