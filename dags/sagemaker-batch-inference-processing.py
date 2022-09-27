@@ -1,8 +1,7 @@
 from datetime import timedelta
 from pendulum import datetime
 
-import boto3
-from airflow.decorators import dag, task, task_group
+from airflow.decorators import dag, task
 from airflow.providers.amazon.aws.operators.sagemaker import (
     SageMakerProcessingOperator,
     SageMakerTransformOperator,
@@ -81,11 +80,14 @@ def sagemaker_batch_inference_processing():
 
     @task
     def get_latest_model_version(mpg):
+        """Uses the Sagemaker API to get the latest model version from a given Model Package Group
+        :param mpg: Sagemaker Model Package Group name
+        :return: model name that has been created with a matching version number.
+        """
         sagemaker_hook = SageMakerHook()
 
         sagemaker_client = sagemaker_hook.get_conn()
 
-        # sagemaker_client = boto3.client('sagemaker')
         registered_models = sagemaker_client.list_model_packages(
             ModelPackageGroupName=mpg
         )
