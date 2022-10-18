@@ -1,2 +1,1 @@
-openlineage-airflow==0.13.1
 apache-airflow-providers-amazon==5.1.0

@@ -5,6 +5,6 @@ import pandas as pd
 # We just need to drop the labels in this case.
 # In most cases you will have more work done here.
 
-df = pd.read_csv('/opt/ml/processing/input/validation.csv', header=None)
+df = pd.read_csv('/opt/ml/processing/input/raw_data.csv', header=None)
 df = df.iloc[:10, 1:]
 df.to_csv('/opt/ml/processing/output/clean_data.csv', header=False, index=False)

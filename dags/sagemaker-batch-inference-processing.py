@@ -1,3 +1,8 @@
+"""
+A batch inference pipeline using Amazon Sagemaker's Model Registry, Batch Transform, and Processing
+features.
+"""
+
 from datetime import timedelta
 from pendulum import datetime
 
@@ -9,7 +14,7 @@ from airflow.providers.amazon.aws.operators.sagemaker import (
 from airflow.providers.amazon.aws.hooks.sagemaker import SageMakerHook
 
 output_s3_key = "experiments-demo/predict/output/"
-raw_data = "experiments-demo/validation.csv"
+raw_data = "experiments-demo/raw_data.csv"
 clean_data = "experiments-demo/predict/input/clean_data.csv"
 
 
@@ -21,18 +26,15 @@ clean_data = "experiments-demo/predict/input/clean_data.csv"
     default_args={
         "retries": 0,
         "retry_delay": timedelta(minutes=3),
-        'aws_conn_id': 'aws_default'
+        'aws_conn_id': 'aws_copy'
     },
     catchup=False,
     tags=["example", "aws", "sagemaker"],
+    doc_md=__doc__
 )
 def sagemaker_batch_inference_processing():
-    """
-    A batch inference pipeline using Amazon Sagemaker's Model Registry, Batch Transform, and Processing
-    features.
-    """
-
     process_data = SageMakerProcessingOperator(
+        aws_conn_id='aws_copy',
         task_id='process_data',
         config={
             "ProcessingJobName": 'astronomer-blogpost-batch-infer-{}'.format("{{ ts_nodash }}"),
@@ -84,7 +86,7 @@ def sagemaker_batch_inference_processing():
         :param mpg: Sagemaker Model Package Group name
         :return: model name that has been created with a matching version number.
         """
-        sagemaker_hook = SageMakerHook()
+        sagemaker_hook = SageMakerHook(aws_conn_id='aws_copy')
 
         sagemaker_client = sagemaker_hook.get_conn()
 
@@ -99,6 +101,8 @@ def sagemaker_batch_inference_processing():
         model_name = "astronomer-blogpost-v{}".format(model_version['ModelPackageVersion'])
 
         return model_name
+
+    model_version_name = get_latest_model_version("{{ var.value.model_package_group }}")
 
     predict = SageMakerTransformOperator(
         task_id='predict',
@@ -126,11 +130,11 @@ def sagemaker_batch_inference_processing():
                 "InstanceCount": 1,
                 "InstanceType": "ml.m5.xlarge"
             },
-            "ModelName": "{{ ti.xcom_pull(task_ids='get_latest_model_version') }}"
+            "ModelName": model_version_name
         }
     )
 
-    [process_data, get_latest_model_version("{{ var.value.model_package_group }}")] >> predict
+    [process_data, model_version_name] >> predict
 
 
 dag = sagemaker_batch_inference_processing()
