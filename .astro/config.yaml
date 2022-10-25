@@ -1,2 +1,4 @@
 project:
   name: sagemaker-batch-inference
+postgres:
+  port: 5435
