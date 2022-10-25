@@ -4,14 +4,14 @@ features.
 """
 
 from datetime import timedelta
-from pendulum import datetime
 
 from airflow.decorators import dag, task
+from airflow.providers.amazon.aws.hooks.sagemaker import SageMakerHook
 from airflow.providers.amazon.aws.operators.sagemaker import (
     SageMakerProcessingOperator,
     SageMakerTransformOperator,
 )
-from airflow.providers.amazon.aws.hooks.sagemaker import SageMakerHook
+from pendulum import datetime
 
 output_s3_key = "experiments-demo/predict/output/"
 raw_data = "experiments-demo/raw_data.csv"
@@ -34,7 +34,6 @@ clean_data = "experiments-demo/predict/input/clean_data.csv"
 )
 def sagemaker_batch_inference_processing():
     process_data = SageMakerProcessingOperator(
-        aws_conn_id='aws_copy',
         task_id='process_data',
         config={
             "ProcessingJobName": 'astronomer-blogpost-batch-infer-{}'.format("{{ ts_nodash }}"),
@@ -84,7 +83,8 @@ def sagemaker_batch_inference_processing():
     def get_latest_model_version(mpg):
         """Uses the Sagemaker API to get the latest model version from a given Model Package Group
         :param mpg: Sagemaker Model Package Group name
-        :return: model name that has been created with a matching version number.
+        :return: Model name that has been created with a matching version number.
+        :rtype: str
         """
         sagemaker_hook = SageMakerHook(aws_conn_id='aws_copy')
 
