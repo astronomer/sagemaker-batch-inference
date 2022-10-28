@@ -8,21 +8,19 @@ from datetime import timedelta
 from airflow.decorators import dag, task, task_group
 from airflow.providers.amazon.aws.hooks.sagemaker import SageMakerHook
 from airflow.providers.amazon.aws.operators.s3 import S3CopyObjectOperator
-from airflow.providers.amazon.aws.operators.sagemaker import (
-    SageMakerTrainingOperator,
-    SageMakerModelOperator,
-)
+from airflow.providers.amazon.aws.operators.sagemaker import SageMakerModelOperator
 from pendulum import datetime
 
-s3_output_path = "experiments-demo-dag"
+from astronomer.providers.amazon.aws.operators.sagemaker import SageMakerTrainingOperatorAsync
 
-test_data = f"{s3_output_path}/test_data.csv"
+s3_output_path = "astronomer-demo-dag"
+
 train_data = f"{s3_output_path}/train_data.csv"
 validation = f"{s3_output_path}/validation_data.csv"
 
-experiment_name = "astronomer-sagemaker-experiment"
-trial_name = "astronomer-sagemaker-experiment"
-training_job_name = "astronomer-sagemaker-training"
+experiment_name = "astronomer-experiment"
+trial_name = "astronomer-trial"
+training_job_name = "astronomer-training"
 
 
 @dag(
@@ -33,8 +31,8 @@ training_job_name = "astronomer-sagemaker-training"
     default_args={
         "retries": 0,
         "retry_delay": timedelta(minutes=3),
-        'aws_conn_id': 'aws_copy'
     },
+
     catchup=False,
     tags=["example", "aws", "sagemaker"],
     doc_md=__doc__
@@ -43,14 +41,6 @@ def sagemaker_training():
     @task_group
     def get_data():
         """Copy data from public sources to SageMaker S3 buckets."""
-
-        copy_test = S3CopyObjectOperator(
-            task_id='copy_test_data',
-            source_bucket_name="sagemaker-sample-files",
-            source_bucket_key="datasets/tabular/uci_abalone/preprocessed/test.csv",
-            dest_bucket_name="{{ var.value.s3_bucket }}",
-            dest_bucket_key=test_data
-        )
 
         copy_train = S3CopyObjectOperator(
             task_id='copy_train_data',
@@ -72,13 +62,13 @@ def sagemaker_training():
     def train_model():
         @task
         def create_experiment(**kwargs):
-            """Create an experiment to track, and if exists already contineu with existing one.
+            """Create an experiment to track, and if exists already continue with existing one.
 
             :param kwargs:
             :return: Response from boto3 client request
             :rtype: dict
             """
-            sagemaker_client = SageMakerHook(aws_conn_id='aws_copy').get_conn()
+            sagemaker_client = SageMakerHook().get_conn()
 
             try:
                 response = sagemaker_client.describe_experiment(
@@ -105,7 +95,7 @@ def sagemaker_training():
             :return: Response from boto3 client request
             :rtype: dict
             """
-            sagemaker_client = SageMakerHook(aws_conn_id='aws_copy').get_conn()
+            sagemaker_client = SageMakerHook().get_conn()
 
             try:
                 response = sagemaker_client.describe_trial(
@@ -126,7 +116,7 @@ def sagemaker_training():
 
                 return response
 
-        train = SageMakerTrainingOperator(
+        train = SageMakerTrainingOperatorAsync(
             task_id='train',
             config={
                 'TrainingJobName': "{0}-{1}".format(training_job_name, "{{ ts_nodash }}"),
@@ -203,7 +193,7 @@ def sagemaker_training():
             :return: Response from boto3 client request
             :rtype: dict
             """
-            sagemaker_client = SageMakerHook(aws_conn_id='aws_copy').get_conn()
+            sagemaker_client = SageMakerHook().get_conn()
 
             try:
                 response = sagemaker_client.create_model_package_group(ModelPackageGroupName=model_package_group)
@@ -220,7 +210,7 @@ def sagemaker_training():
             :return: Response from boto3 client request
             :rtype: dict
             """
-            sagemaker_client = SageMakerHook(aws_conn_id='aws_copy').get_conn()
+            sagemaker_client = SageMakerHook().get_conn()
 
             response = sagemaker_client.create_model_package(
                 ModelPackageGroupName=model_package_group,
