@@ -145,7 +145,7 @@ def sagemaker_batch_inference():
         }
     )
 
-    copy_test >> process_data
+    copy_data >> process_data
     [process_data, model_version_name] >> predict
 
 
