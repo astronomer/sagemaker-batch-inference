@@ -38,7 +38,7 @@ clean_data = f"{base_folder}/predict/input/clean_data.csv"
     doc_md=__doc__
 )
 def sagemaker_batch_inference():
-    copy_test = S3CopyObjectOperator(
+    copy_data = S3CopyObjectOperator(
         task_id='copy_test_data',
         source_bucket_name="sagemaker-sample-files",
         source_bucket_key="datasets/tabular/uci_abalone/preprocessed/test.csv",
