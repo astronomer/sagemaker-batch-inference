@@ -1,0 +1,10 @@
+# These categories will be applied to all DAGs in the repo.
+categories:
+  - AI + Machine Learning
+  - Compute
+  - Model Registry
+# List of DAGs that should be published to the Astronomer Registry.
+dags:
+  - path: dags/sagemaker-batch-inference.py
+  - path: dags/sageamker-train-model.py
+  
