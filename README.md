@@ -20,5 +20,6 @@ These DAGs are examples on how to use Airflow to orchestrate your ML Ops batch p
     - `s3_bucket` - The same bucket used with the provided notebook for inputs and outputs. (The value assigned to the `default_bucket` variable in the notebook)
     - `model_package_group` - The name of the Sagemaker Model Registry Group that you created
     - `role_arn` - Role ARN to be used with the Processing Job task. Usually your Sagemaker execution Role Arn.
+    - `ecr_repository_uri` - ECR URI where you pushed the SageMakerProcessing container image to.
  - Airflow Connections
    - `aws_default` - [AWS](https://airflow.apache.org/docs/apache-airflow-providers-amazon/stable/connections/aws.html)
